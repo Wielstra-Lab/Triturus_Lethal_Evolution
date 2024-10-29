@@ -1,0 +1,35 @@
+#!/bin/bash
+
+#SBATCH --ntasks=4
+#SBATCH --cpus-per-task=1
+#SBATCH --partition=cpu_natbio
+#SBATCH --output=%x_%j_out.txt
+#SBATCH --mem=150G
+#SBATCH --time=6:00:00
+#SBATCH --error=%x_%j_err.txt
+#SBATCH --job-name=Trit_blast_PW
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=james.france@naturalis.nl
+
+cd /data1/francejm/Final_map/Triturus_linkage_map/Trit_map_Main_BLAST
+
+echo "lets try Blast"
+
+module load BLAST+
+
+echo "begin"
+
+blastn -query Trit_map_Main.trimmed.sequences.fasta  -db /data1/francejm/Pluro_genome/aPleWal1.pri.20220803.fasta -outfmt 6 -evalue 1e-20 -num_threads 4 > Trit_TC_Pluro_blast_out_raw.txt
+
+echo "now sort"
+
+sort -k1,1 -k12,12nr Trit_TC_Pluro_blast_out_raw.txt > Trit_TC_Pluro_blast_out_sorted.txt
+
+echo "now filter"
+
+module load R
+
+Rscript ~/JaFrance/Linkage_Map_Scripts/Filter_blast.R Trit_TC_Pluro_blast_out_sorted.txt Trit_TC_Pluro_blast_out_filtered.txt
+
+echo "all done, have a wonderful day!"
+

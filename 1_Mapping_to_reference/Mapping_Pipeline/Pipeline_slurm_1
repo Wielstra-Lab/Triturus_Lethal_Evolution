@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=15
+#SBATCH --partition=cpu_natbio
+#SBATCH --output=output_%j.txt
+#SBATCH --mem=100GB
+#SBATCH --error=error_output_%j.txt
+#SBATCH --job-name=YOUR_JOBNAME
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=YOU@naturalis.nl
+
+module load VCFtools
+module load SAMtools
+module load BWA
+module load GATK
+module load Trimmomatic
+module load Perl
+
+Data="YOUR_RAW_DATA_FOLDER"
+Terminator="Characters_after_sample_name"
+
+Scratch="/scratchdata/$SLURM_JOB_USER/$SLURM_JOB_ID"
+
+perl Pipeline_1.pl -d $Data -t $Terminator -c -x $Scratch
+
+

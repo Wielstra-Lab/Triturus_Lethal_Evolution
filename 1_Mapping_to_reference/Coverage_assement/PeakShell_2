@@ -1,0 +1,20 @@
+#!/bin/bash
+
+MyIn=$1
+MyCov="${MyIn}_Coverage"
+MyOut="${MyIn}_PeakCoverage"
+MyNotes="${MyIn}_PeakNotes"
+
+echo $MyIn
+echo $MyCov
+echo $MyOut
+echo $MyNotes
+
+samtools depth $MyIn > $MyCov
+
+Rscript ~/JaFrance/Scripts/Peakloop2.R $MyCov $MyOut > $MyNotes
+
+
+
+
+

@@ -1,0 +1,72 @@
+MAPPING PIPELINE SETTINGS README (1.0)
+
+These are settings which you can use with the master mapping pipeline. To use add the relevant letter after the command to 
+run the master script. These settings come in two types, options and flags: For options you also need to tell the script the 
+settings you want it to use for that particular option. For flags, there are only two possible settings and to switch between
+them you only need to add in the relevant flag. See examples after the list of options and flags:
+
+Note: all of these are optional, the script will still run even if none are used. Generally you will want to specify the raw
+data directory, and a nice way to shorten the file name, but the if you just want to call the script from a directory with some
+fastq.gz files in it, the script will still try to map them.
+
+OPTIONS
+
+option -d = The path to the directory containing raw fastq.gz files (e.g. "-d /data1/francejm/test_pool_1")
+	(If there is no "raw data" directory specified the script will default to the current working directory)
+
+option -t = The terminator which marks the end of the 'sample name' in the raw file names. For example if we had samples in
+	format BW_330_Julia-Pool-3_74324-104_ACGCTAATCTAATATGCCAG_L001_R1_001_AHGLCWDRXY.filt.fastq.gz we can use the option
+	"-t _J" and the sample name used in the script will be "BW_330". (If no terminator is specified then the script will 
+	use characters before the string "_R1" as the sample name, so in the example case it the sample name would be 
+	"BW_330_Julia-Pool-3_74324-104_ACGCTAATCTAATATGCCAG_L001")
+
+option -a = The path to the adapter file used in the trimming step. No need to use this in most cases as the script will
+	default to "/data1/projects/pi-vissermcde/Triturus_reference/TruSeq2-PE_trimmomatic.fa" which is our standard
+	adapter file.
+
+option -r = The path to the reference file used for mapping. In most cases we want to use the default:
+	"/data1/projects/pi-vissermcde/Triturus_reference/triturusTargetsV1Oneliners_7139unique.fasta" so don't use this
+	option unless you want to map to a different reference
+
+option -i = The path to the interval file used for making the combined gvcf. Don't use this unless you know what you're doing,
+	 as if none specified an interval file will automatically be made from the reference fasta.
+
+option -b = The path to the installation of bbmap. You need to use this only if you have installed bbmap somewhere other than 
+	at "~/bbmap" (which is the default).
+
+option -o = The name (and path to) of the final output combined g.vcf generated at the end of the script. The default is
+	"Main_output.g.vcf" so change use if you wan't a different output file name
+
+option -p = The number of simultaneous processes to use in the steps managed by parallel fork manager, the default is 15. Use
+	if you have a reason to use more or fewer threads
+ 
+option -x = The path to a directory you want to use as for hosting temprorary files used by some programmes. The default is your
+  "~/data" directory. Use this if, for example, you want to use the scratch space assigned to a slurm job as the temp directory. 
+
+FLAGS
+
+flag -c = If -c is used, all the intermediate files (and directories) before the final deduplicated bams will be deleted 
+	after use. This can save disk space an saves you cleaning up later.
+
+flag -v = If -v is used, the script will not attempt to generate the final combined g.vcf. Use if, for example, you intend to 
+	make the final combined data set from multiple batches of data which you are processing seperately.
+
+EXAMPLE
+
+For example if I wanted to run all the data from a batch of samples in the directory "test_pool_1", all in the format 
+1802_S103_L005_R1_001.fastq.gz, and I only wanted the "1802_S103" part. Lets say I only wanted to run 5 threads, I wanted 
+to delete the intermediate files, and I wanted the output name of the final combined g.vcf to be "examples.g.vcf". I would 
+use the settings:
+
+-d /data1/francejm/test_pool_1
+-t _L
+-o examples.g.vcf
+-p 5
+-c
+
+and run the command: 
+
+perl /home/francejm/JaFrance/Master_Script_Dev/Master_beta.pl -d /data1/francejm/test_pool_1 -t _L -o examples.g.vcf -p 5 -c
+
+
+

@@ -1,0 +1,57 @@
+#!/bin/bash
+
+#SBATCH --job-name=Liss_map_all
+#SBATCH --output=%x_%j.out
+#SBATCH --error=%x_%j.err
+#SBATCH --mail-user="james.france@naturalis.nl"
+#SBATCH --mail-type="ALL"
+#SBATCH --partition=cpu_natbio
+#SBATCH --time=6:00:00
+#SBATCH --tasks=4
+#SBATCH --mem=80GB
+
+input_vcf=/data1/francejm/Final_map/Lissotriton_linkage_map/Lissotriton_joint.vcf.filtered.recode.vcf
+ped_file=/data1/francejm/Final_map/Lissotriton_linkage_map/Lissotriton_map_pedigree_1.ped
+output_code=Liss_map_all
+
+mkdir $output_code
+
+cd $output_code
+
+#Step 1
+
+java -cp ~/LepMap/bin/ ParentCall2 data = $ped_file vcfFile = $input_vcf > $output_code.parent.call
+
+#Step 2
+
+java -cp ~/LepMap/bin/ SeparateChromosomes2 data = $output_code.parent.call lodLimit = 22 distortionLod = 1 > $output_code.chromosomes.txt
+
+echo Markers on each group after step 2:
+
+for i in {0..15}; do echo "markers on chromsome "$i; grep -w $i $output_code.chromosomes.txt | wc -l; done
+
+#Step 3
+
+java -cp ~/LepMap/bin/ JoinSingles2All data =  $output_code.parent.call  map = $output_code.chromosomes.txt lodLimit = 15 lodDifference = 5 iterate = 1  > $output_code.singles.txt
+
+sort $output_code.singles.txt|uniq -c|sort -n
+
+#Step 4
+
+for i in {0..12}
+do
+  output=$output_code".order_"$i"_1.txt"
+  echo "working on "$output
+  java -cp ~/LepMap/bin/ OrderMarkers2 map = $output_code.singles.txt data = $output_code.parent.call chromosome = $i sexAveraged = 1 numMergeIterations = 12 numPolishIterations = 8 minError = 0.01 numThreads = 4 > $output
+  echo "done "$output
+done
+
+#Step 5
+
+for i in {1..12}; do tail -n +4 $output_code".order_"$i"_1.txt" | while read marker position line; do echo -e $marker"\t"$position"\t"$i; done; done > $output_code.ordered.txt
+
+cat $output_code.parent.call | cut -f 1,2 | awk '(NR>=7)' > $output_code.snps.txt
+
+awk -vFS="\t" -vOFS="\t" '(NR==FNR){s[NR-1]=$0}(NR!=FNR){if ($1 in s) $1=s[$1];print}' $output_code.snps.txt $output_code.ordered.txt > $output_code.ordered.mapped
+
+sed 's/TRINITY_//' $output_code.ordered.mapped | cut -f 1,3,4 > $output_code.mapped.short
