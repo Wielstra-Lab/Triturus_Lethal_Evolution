@@ -1,10 +1,12 @@
-### This repository details the bioinformatic pipelines used to investigate the comparative genomics of the balanced lethal system found in Triturus newts
+## This repository details the bioinformatic pipelines used to investigate the comparative genomics of the balanced lethal system found in Triturus newts
+
+#### Linkage maps for _Triturus_ and _Lissotriton_ are available in the file: Triturus and Lissotriton Linkage Maps.xlsx
+
+#### The sequences of all targets captured in the study are available in the file: triturusTargetsV1Oneliners_7139unique.fasta
 
 #### The associate publication is available on BioRxiv:
 
-#### The raw data is available via NCBI: bioproject - PRJNA1175462
-
-#### Additional data (complete linkage maps and sequences of markers) are available on Zenodo repository 10.5281/zenodo.14008530   
+#### The raw data is available via NCBI: bioproject - PRJNA1175462  
 
 #### The study is broken into 6 sections - each of which contains a detailed readme in its respective folder:
 
