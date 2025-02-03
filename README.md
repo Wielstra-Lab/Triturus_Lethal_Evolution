@@ -4,7 +4,7 @@
 
 #### The sequences of all targets captured in the study are available in the file: triturusTargetsV1Oneliners_7139unique.fasta
 
-#### The associate publication is available on BioRxiv:
+#### The associate publication is available on BioRxiv: https://doi.org/10.1101/2024.10.29.620207
 
 #### The raw data is available via NCBI: bioproject - PRJNA1175462  
 
